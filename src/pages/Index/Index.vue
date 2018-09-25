@@ -9,8 +9,13 @@ export default {
 }
 </script>
 
-<style lang="css" scoped>
-#login {
-  color: lightblue;
+<style lang="less" scoped>
+@import "../../assets/base.less";
+
+#index {
+  color: @themeColor;
 }
+
+@color: pink;
+
 </style>
