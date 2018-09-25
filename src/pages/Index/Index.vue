@@ -1,0 +1,16 @@
+<template>
+  <div id="index">
+    首页
+  </div>
+</template>
+
+<script>
+export default {
+}
+</script>
+
+<style lang="css" scoped>
+#login {
+  color: lightblue;
+}
+</style>
