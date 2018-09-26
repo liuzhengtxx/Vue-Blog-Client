@@ -11,6 +11,10 @@
 
 # 项目记录
 ## 安装 / 导入 ElementUI
+```
+npm i element-ui -S
+```
+
 ```JavaScript
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
