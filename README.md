@@ -21,3 +21,28 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.use(ElementUI)
 ```
+
+## 静态页布局
+大量使用 `Grid` 网格布局
+```LESS
+.item {
+  display: grid;
+  grid: auto auto / 80px 1fr;  // grid: 行 / 列
+  margin: 20px 0;
+
+  .avatar {
+    grid-column: 1 / 2;   //列 范围取：  1 - 2 线之间
+    grid-row: 1 / span 2;      //行 范围取：  1 - 3 线之间（span 2 横跨 2）
+    justify-self: center;
+    margin-left: 0;
+    text-align: center;
+  }
+}
+```
+
+## helper request.js
+将 `axios` 再一次进行封装
+
+## Vuex
+创建 `store`，并拆分 `modules`。将用户相关放入 `auth.js` ，博客内容相关放入 `blog.js` 。
+使用 `Vuex` 实现 登录/注册 。

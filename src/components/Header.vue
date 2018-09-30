@@ -116,6 +116,7 @@ header.login {
 
   .user {
     position: relative;
+    cursor: pointer;
 
     ul {
       display: none;
@@ -138,6 +139,10 @@ header.login {
           background-color: #eaeaea;
         }
       }
+    }
+
+    &:hover ul {
+      display: block;
     }
   }
 }
