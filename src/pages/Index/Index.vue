@@ -1,60 +1,54 @@
 <template>
   <div id="index">
     <section class="blog-posts">
-      <div class="item">
+      <router-link v-for="blog in blogs" :to="`/detail/${blog.id}`" class="item">
         <figure class="avatar">
-          <img src="http://cn.gravatar.com/avatar/1?s=128&d=identicon" alt="">
-          <figcaption>evenyao</figcaption>
+          <img :src="blog.user.avatar" :alt="blog.user.username">
+          <figcaption>{{blog.user.username}}</figcaption>
         </figure>
-        <h3>我的博文 <span>3天前</span></h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.</p>
-      </div>
-
-      <div class="item">
-        <figure class="avatar">
-          <img src="http://cn.gravatar.com/avatar/1?s=128&d=identicon" alt="">
-          <figcaption>evenyao</figcaption>
-        </figure>
-        <h3>我的博文 <span>3天前</span></h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.</p>
-      </div>
-
-      <div class="item">
-        <figure class="avatar">
-          <img src="http://cn.gravatar.com/avatar/1?s=128&d=identicon" alt="">
-          <figcaption>evenyao</figcaption>
-        </figure>
-        <h3>我的博文 <span>3天前</span></h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.</p>
-      </div>
+        <h3>{{blog.title}} <span>{{blog.createdAt}}</span></h3>
+        <p>{{blog.description}}</p>
+      </router-link>
+    </section>
+    <section class="pagination">
+      <el-pagination layout="prev, pager, next" :total="total" @current-change="onPageChange"></el-pagination>
     </section>
   </div>
 </template>
 
 <script>
-import request from '@/helpers/request.js'
-import auth from '@/api/auth.js'
 import blog from '@/api/blog.js'
-window.request = request
-window.auth = auth
-window.blog = blog
 
 export default {
+  data () {
+    return {
+      blogs: [],
+      total: 0,
+      page: 1,
+    }
+  },
+
+  created () {
+    this.page = parseInt(this.$route.query.page) || 1
+    blog.getIndexBlogs({ page: this.page }).then(res => {
+      console.log(res)
+      this.blogs = res.data
+      this.total = res.total
+      this.page = res.page
+    })
+  },
+
+  methods: {
+    onPageChange (newPage) {
+      blog.getIndexBlogs( { page: newPage} ).then(res => {
+        console.log(res)
+        this.blogs = res.data
+        this.total = res.total
+        this.page = res.page
+        this.$router.push( { path: '/', query: { page: newPage } })
+      })
+    }
+  }
 }
 </script>
 
@@ -105,10 +99,13 @@ export default {
       margin-top: 0;
     }
 
-
   }
 
-
+  .pagination {
+    display: grid;
+    text-align: center;
+    margin-bottom: 30px;
+  }
 
 
 }

@@ -66,3 +66,11 @@ router.beforeEach((to, from, next) => {
   }
 })
 ```
+
+## 完善 pages
+分页组件
+```HTML
+<section>
+  <el-pagination layout="prev, pager, next" :total="total" @current-change="onPageChange"></el-pagination>
+</section>
+```
