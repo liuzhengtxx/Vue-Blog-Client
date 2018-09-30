@@ -5,7 +5,7 @@
 ## 项目涉及到技术栈：
 - Vue：Vue、Vue-router、Vuex、Vue-cli
 - CSS的预处理框架：less
-- 插件：ElementUI、axios
+- 插件：ElementUI、axios、marked
 - 接口：auth.js、blog.js
 
 
@@ -68,9 +68,13 @@ router.beforeEach((to, from, next) => {
 ```
 
 ## 完善 pages
+### 首页
 分页组件
 ```HTML
 <section>
   <el-pagination layout="prev, pager, next" :total="total" @current-change="onPageChange"></el-pagination>
 </section>
 ```
+
+### 详情页
+安装 `marked`
