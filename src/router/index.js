@@ -9,9 +9,11 @@ import Me from '@/pages/Me/Me'
 import Register from '@/pages/Register/Register'
 import User from '@/pages/User/User'
 
+import store from '../store'
+
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -22,29 +24,52 @@ export default new Router({
       name: 'Login',
       component: Login
     }, {
-      path: '/create',
-      name: 'Create',
-      component: Create
-    }, {
-      path: '/detail',
-      name: 'Detail',
-      component: Detail
-    }, {
-      path: '/edit',
-      name: 'Edit',
-      component: Edit
-    }, {
-      path: '/me',
-      name: 'Me',
-      component: Me
-    }, {
       path: '/register',
       name: 'Register',
       component: Register
     }, {
-      path: '/user',
+      path: '/create',
+      name: 'Create',
+      component: Create,
+      meta: { requiresAuth: true }
+    }, {
+      path: '/detail/:blogId',
+      name: 'Detail',
+      component: Detail
+    }, {
+      path: '/edit/:blogId',
+      name: 'Edit',
+      component: Edit,
+      meta: { requiresAuth: true }
+    }, {
+      path: '/me',
+      name: 'Me',
+      component: Me,
+      meta: { requiresAuth: true }
+    }, {
+      path: '/user/:userId',
       name: 'User',
       component: User
     }
   ]
 })
+
+// 每次路由切换执行对应函数
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    store.dispatch('checkLogin').then(isLogin => {
+      if (!isLogin) {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        })
+      } else {
+        next()
+      }
+    })
+  } else {
+    next()
+  }
+})
+
+export default router

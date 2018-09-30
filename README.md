@@ -46,3 +46,23 @@ Vue.use(ElementUI)
 ## Vuex
 创建 `store`，并拆分 `modules`。将用户相关放入 `auth.js` ，博客内容相关放入 `blog.js` 。
 使用 `Vuex` 实现 登录/注册 。
+
+### 完善动态路由 和 权限
+修改 `router` 中 `index.js` 结构。先 `new Router`，最后 `export default router` 导出。
+```JavaScript
+// 每次路由切换执行对应函数
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (true) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+```
