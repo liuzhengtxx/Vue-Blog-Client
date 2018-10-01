@@ -8,7 +8,7 @@
       <router-link class="item" :to="`/detail/${blog.id}`" v-for="blog in blogs" :key="blog.id">
         <div class="data">
           <span class="day">{{splitDate(blog.createdAt).date}}</span>
-          <span class="month">{{splitDate(blog.createdAt).month}}</span>
+          <span class="month">{{splitDate(blog.createdAt).month}}月</span>
           <span class="year">{{splitDate(blog.createdAt).year}}</span>
         </div>
         <h3>{{blog.title}}</h3>
@@ -16,7 +16,7 @@
       </router-link>
     </section>
     <section class="pagination">
-      <el-pagination layout="prev, pager, next" :total="total" @current-change="onPageChange"></el-pagination>
+      <el-pagination layout="prev, pager, next" :total="total" :current-page="page" @current-change="onPageChange"></el-pagination>
     </section>
   </div>
 </template>
@@ -78,7 +78,7 @@ export default {
 <style lang="less" scoped>
 @import "../../assets/base.less";
 
-#me,#user {
+#user {
 
   .user-info {
     display: grid;

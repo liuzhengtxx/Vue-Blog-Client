@@ -1,60 +1,105 @@
 <template>
   <div id="me">
     <section class="user-info">
-      <img class="avatar" src="http://cn.gravatar.com/avatar/1?s=128&d=identicon" alt="">
-      <h3>evenyao</h3>
+      <img class="avatar" :src="user.avatar" :alt="user.username" :title="user.username">
+      <h3>{{user.username}}</h3>
     </section>
     <section>
-      <div class="item">
+      <router-link class="item" :to="`/detail/${blog.id}`" v-for="blog in blogs" :key="blog.id">
         <div class="data">
-          <span class="day">20</span>
-          <span class="month">5月</span>
-          <span class="year">2018</span>
+          <span class="day">{{splitDate(blog.createdAt).date}}</span>
+          <span class="month">{{splitDate(blog.createdAt).month}}月</span>
+          <span class="year">{{splitDate(blog.createdAt).year}}</span>
         </div>
-        <h3>我的博文</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.</p>
+        <h3>{{blog.title}}</h3>
+        <p>{{blog.description}}</p>
         <div class="actions">
-          <router-link to="/edit">编辑</router-link>
-          <a href="#">删除</a>
+          <router-link :to="`/edit/${blog.id}`">编辑</router-link>
+          <a href="#" @click.prevent="onDelete(blog.id)">删除</a>
         </div>
-      </div>
-
-      <div class="item">
-        <div class="data">
-          <span class="day">20</span>
-          <span class="month">5月</span>
-          <span class="year">2018</span>
-        </div>
-        <h3>我的博文</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.</p>
-        <div class="actions">
-          <router-link to="/edit">编辑</router-link>
-          <a href="#">删除</a>
-        </div>
-      </div>
+      </router-link>
+    </section>
+    <section class="pagination">
+      <el-pagination layout="prev, pager, next" :total="total" :current-page="page" @current-change="onPageChange"></el-pagination>
     </section>
   </div>
 </template>
 
+
+
 <script>
+import blog from '@/api/blog'
+import { mapGetters } from 'vuex'
+
 export default {
+  data () {
+    return {
+      blogs: [],
+      page: 1,
+      total: 0
+    }
+  },
+
+  computed: {
+    ...mapGetters(['user'])
+  },
+
+  created () {
+    this.page = parseInt(this.$route.query.page) || 1
+    blog.getBlogsByUserId(this.user.id, { page: this.page })
+      .then(res => {
+        console.log(res)
+        this.page = res.page
+        this.total = res.total
+        this.blogs = res.data
+      })
+  },
+
+  methods: {
+    onPageChange (newPage) {
+      blog.getBlogsByUserId(this.user.id, { page: newPage }).then(res => {
+        console.log(res)
+        this.blogs = res.data
+        this.total = res.total
+        this.page = res.page
+        this.$router.push({ path: "/me", query: { page: newPage}})
+      })
+    },
+
+    onDelete (blogId) {
+      console.log(blogId)
+      this.$confirm('此操作将永久删除该博客，是否继续?','提示',{
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        blog.deleteBlog({ blogId }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        })
+      })
+    },
+
+    // 格式化 年 月 日
+    splitDate (dataStr) {
+      let dateObj = typeof dataStr === 'object' ? dataStr : new Date(dataStr)
+      return {
+        date: dateObj.getDate(),
+        month: dateObj.getMonth() + 1,
+        year: dateObj.getFullYear()
+      }
+    }
+  }
 }
 </script>
+
 
 <style lang="less" scoped>
 @import "../../assets/base.less";
 
-#me,#user {
+#me {
 
   .user-info {
     display: grid;
@@ -119,7 +164,7 @@ export default {
       a {
         color: @themeLighterColor;
       }
-      
+
     }
   }
 }

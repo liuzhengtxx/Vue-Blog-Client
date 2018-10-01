@@ -50,19 +50,21 @@ Vue.use(ElementUI)
 ### 完善动态路由 和 权限
 修改 `router` 中 `index.js` 结构。先 `new Router`，最后 `export default router` 导出。
 ```JavaScript
-// 每次路由切换执行对应函数
+// 每次路由切换执行对应函数 判断用户是否登录 没有登录则跳转 login
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (true) {
-      next({
-        path: '/login',
-        query: { redirect: to.fullPath }
-      })
-    } else {
-      next()
-    }
+    store.dispatch('checkLogin').then(isLogin => {
+      if (!isLogin) {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        })
+      } else {
+        next()
+      }
+    })
   } else {
-    next()
+    next() // 确保一定要调用 next()
   }
 })
 ```
@@ -77,4 +79,67 @@ router.beforeEach((to, from, next) => {
 ```
 
 ### 详情页
-安装 `marked`
+安装 `marked`，在 `computed` 中声明，并在模板中使用。
+```JavaScript
+computed: {
+  markdown () {
+    return marked(this.rawContent)
+  }
+}
+```
+```HTML
+<section class="article" v-html="markdown">
+  {{markdown}}
+</section>
+```
+
+**添加 util.js 插件，并使用 `export default` 导出使其成为全局方法，作为 `friendlyDate` 显示'友好'时间**
+```JavaScript
+export default {
+  install(Vue, options) {
+    Vue.prototype.friendlyDate = friendlyDate
+  }
+}
+```
+
+
+### 用户页
+使用 `splitDate` 函数格式化年月日事件并在模板中使用。
+```JavaScript
+// 格式化 年 月 日
+splitDate (dataStr) {
+  let dateObj = typeof dataStr === 'object' ? dataStr : new Date(dataStr)
+  return {
+    date: dateObj.getDate(),
+    month: dateObj.getMonth() + 1,
+    year: dateObj.getFullYear()
+  }
+}
+```
+```HTML
+<div class="data">
+  <span class="day">{{splitDate(blog.createdAt).date}}</span>
+  <span class="month">{{splitDate(blog.createdAt).month}}</span>
+  <span class="year">{{splitDate(blog.createdAt).year}}</span>
+</div>
+```
+
+### 我的页面
+和用户页雷同，清除所有和 `user` 数据相关的逻辑。增加 `router-link` 跳转到编辑页，并新增删除功能接口
+```JavaScript
+onDelete (blogId) {
+  console.log(blogId)
+  this.$confirm('此操作将永久删除该博客，是否继续?','提示',{
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    blog.deleteBlog({ blogId }).then(() => {
+      this.$message({
+        type: 'success',
+        message: '删除成功!'
+      })
+    })
+  })
+}
+```

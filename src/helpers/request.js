@@ -3,7 +3,7 @@ import { Message } from 'element-ui'
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 axios.defaults.baseURL = 'http://blog-server.hunger-valley.com'
-axios.defaults.withCredentials = true  // 跨域
+axios.defaults.withCredentials = true  //跨域
 
 export default function request(url, type = 'GET', data = {}) {
   return new Promise((resolve, reject) => {
@@ -19,7 +19,6 @@ export default function request(url, type = 'GET', data = {}) {
     axios(option).then(res => {
       console.log(res.data)
       if (res.data.status === 'ok') {
-        Message.success(res.data.msg)
         resolve(res.data)
       } else {
         Message.error(res.data.msg)

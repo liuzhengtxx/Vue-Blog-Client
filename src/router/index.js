@@ -10,6 +10,7 @@ import Register from '@/pages/Register/Register'
 import User from '@/pages/User/User'
 
 import store from '../store'
+window.store = store
 
 Vue.use(Router)
 
@@ -54,7 +55,7 @@ const router = new Router({
   ]
 })
 
-// 每次路由切换执行对应函数
+// 每次路由切换执行对应函数 判断用户是否登录 没有登录则跳转 login
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     store.dispatch('checkLogin').then(isLogin => {
@@ -68,7 +69,7 @@ router.beforeEach((to, from, next) => {
       }
     })
   } else {
-    next()
+    next() // 确保一定要调用 next()
   }
 })
 
