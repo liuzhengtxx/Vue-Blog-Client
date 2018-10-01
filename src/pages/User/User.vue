@@ -1,45 +1,77 @@
 <template>
   <div id="user">
     <section class="user-info">
-      <img class="avatar" src="http://cn.gravatar.com/avatar/1?s=128&d=identicon" alt="">
-      <h3>evenyao</h3>
+      <img class="avatar" :src="user.avatar" :alt="user.username" :title="user.username">
+      <h3>{{user.username}}</h3>
     </section>
     <section>
-      <div class="item">
+      <router-link class="item" :to="`/detail/${blog.id}`" v-for="blog in blogs" :key="blog.id">
         <div class="data">
-          <span class="day">20</span>
-          <span class="month">5月</span>
-          <span class="year">2018</span>
+          <span class="day">{{splitDate(blog.createdAt).date}}</span>
+          <span class="month">{{splitDate(blog.createdAt).month}}</span>
+          <span class="year">{{splitDate(blog.createdAt).year}}</span>
         </div>
-        <h3>我的博文</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.</p>
-      </div>
-
-      <div class="item">
-        <div class="data">
-          <span class="day">20</span>
-          <span class="month">5月</span>
-          <span class="year">2018</span>
-        </div>
-        <h3>我的博文</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.</p>
-      </div>
+        <h3>{{blog.title}}</h3>
+        <p>{{blog.description}}</p>
+      </router-link>
+    </section>
+    <section class="pagination">
+      <el-pagination layout="prev, pager, next" :total="total" @current-change="onPageChange"></el-pagination>
     </section>
   </div>
 </template>
 
 <script>
+import blog from '@/api/blog'
+
 export default {
+  data () {
+    return {
+      blogs: [],
+      user: {},
+      page: 1,
+      total: 0
+    }
+  },
+
+  created () {
+    this.userId = this.$route.params.userId
+    this.page = this.$route.query.page || 1
+
+    blog.getBlogsByUserId(this.userId, { page: this.page })
+    .then(res => {
+      console.log(res)
+      this.page = res.page
+      this.total = res.total
+      this.blogs = res.data
+      if(res.data.lenght > 0) {
+        this.user = res.data[0].user
+      }
+    })
+  },
+
+  methods: {
+    //分页
+    onPageChange (newPage) {
+      blog.getBlogsByUserId(this.userId, { page: newPage} ).then(res => {
+        console.log(res)
+        this.blogs = res.data
+        this.total = res.total
+        this.page = res.page
+        this.$router.push( { path: `/user/${this.userId}`, query: { page: newPage } })
+      })
+    },
+
+    // 格式化 年 月 日
+    splitDate (dataStr) {
+      let dateObj = typeof dataStr === 'object' ? dataStr : new Date(dataStr)
+      return {
+        date: dateObj.getDate(),
+        month: dateObj.getMonth() + 1,
+        year: dateObj.getFullYear()
+      }
+    }
+  }
 }
 </script>
 
