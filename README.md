@@ -1,6 +1,9 @@
 # Vue-Blog-Client
 > Vue 2.5 开发共享博客客户端。
 
+## 效果预览：
+![](https://evenyao-1257191344.cos.ap-chengdu.myqcloud.com/%E5%85%B1%E4%BA%AB%E5%8D%9A%E5%AE%A2%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D%E5%9B%BE.jpg)
+
 ## 项目涉及到技术栈：
 - Vue：Vue、Vue-router、Vuex、Vue-cli
 - CSS的预处理框架：less
