@@ -1,5 +1,4 @@
 # Vue-Blog-Client
-
 > Vue 2.5 开发共享博客客户端。
 
 ## 项目涉及到技术栈：
@@ -70,6 +69,27 @@ router.beforeEach((to, from, next) => {
 ```
 
 ## 完善 pages
+### 创建页
+使用 `el-switch`，搭配 `atIndex` 选择是否展示。
+```HTML
+<p>
+  <label>是否展示到首页</label>
+  <el-switch v-model="atIndex" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+</p>
+```
+
+```JavaScript
+methods: {
+  onCreate () {
+    blog.createBlog({ title: this.title, content: this.content, description: this.description, atIndex: this.atIndex })
+      .then(res => {
+        this.$message.success(res.msg)
+        this.$router.push({ path: `/detail/${res.data.id}`})
+      })
+  }
+}
+```
+
 ### 首页
 分页组件
 ```HTML
@@ -139,7 +159,23 @@ onDelete (blogId) {
         type: 'success',
         message: '删除成功!'
       })
+      this.blogs = this.blogs.filter(blog => blog.id != blogId)  //删除后立即刷新 DOM
     })
+  })
+}
+```
+
+### 编辑页
+和创建页逻辑结构和逻辑相似，但需要获取编辑页已有数据。
+```JavaScript
+// 利用 created 生命周期钩子来获取编辑页的数据
+created () {
+  this.blogId = this.$route.params.blogId
+  blog.getDetail({ blogId: this.blogId }).then(res => {
+    this.title = res.data.title
+    this.description = res.data.description
+    this.content = res.data.content
+    this.atIndex = res.data.atIndex
   })
 }
 ```
